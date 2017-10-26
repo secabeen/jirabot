@@ -53,7 +53,7 @@ Disabling all of this jira-specific stuff for now
         message = 'https://help.chem.ucsb.edu/rt/Ticket/Display.html?id='+ticket
       else 
 	ticket = ticket[1..-1]
-        message = 'https://www.lscg.ucsb.edu/helpdesk/admin/editTicket.php?taskid='+ticket
+        message = 'https://www.lscg.ucsb.edu/helpdesk/tech/editTicket.php?taskid='+ticket
       end
       client.say(channel: data.channel, text: message)
     end
