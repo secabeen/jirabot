@@ -1,9 +1,9 @@
 require 'sinatra/base'
 
-module JiraBot
+module LSCGBot
   class Web < Sinatra::Base
     get '/' do
-      'JiraBot has issues. In a good way.'
+      'LSCGBot has issues. In a good way.'
     end
   end
 end

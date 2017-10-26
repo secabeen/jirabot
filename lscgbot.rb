@@ -2,8 +2,8 @@ require 'slack-ruby-bot'
 require "net/https"
 require "uri"
 
-class JiraBot < SlackRubyBot::Bot
-  match(/([a-z]+-[0-9]+)/i) do |client, data, issues|
+class LSCGBot < SlackRubyBot::Bot
+  match(/([0-9]{9}|#\d+)/i) do |client, data, issues|
     puts data.text
     results = []
     tomatch = data.text
@@ -17,10 +17,12 @@ class JiraBot < SlackRubyBot::Bot
     
     # Now grab everything that looks like a JIRA ticket, dump it into an array, grab uniques.
     
-    tomatch.scan(/([a-z]+-[0-9]+)/i) do |i,j|
+    tomatch.scan(/([0-9]{9}|#\d+)/i) do |i,j|
     	results << i.upcase
     end
     results.uniq.each do |ticket|
+=begin 
+Disabling all of this jira-specific stuff for now
         url = ENV["JIRA_PREFIX"]+"rest/api/latest/issue/"+ticket
         direct = ENV["JIRA_PREFIX"]+"browse/"+ticket
         uri = URI.parse(url)
@@ -45,10 +47,16 @@ class JiraBot < SlackRubyBot::Bot
             end
             client.say(channel: data.channel, text: message)
         end
+=end
+      if ticket =~ /#/
+	ticket = ticket[1..-1]
+        message = 'https://help.chem.ucsb.edu/rt/Ticket/Display.html?id='+ticket
+      else 
+        message = 'https://www.lscg.ucsb.edu/helpdesk/admin/editTicket.php?taskid='+ticket
+      end
+      client.say(channel: data.channel, text: message)
     end
-
-
   end
 end
 
-JiraBot.run
+LSCGBot.run

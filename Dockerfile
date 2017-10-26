@@ -3,8 +3,8 @@ MAINTAINER Guillaume Carre <guillaume.carre@ticketfly.com>
 
 RUN apt-get update && apt-get install -y bundler
 
-ADD . /jirabot
-WORKDIR /jirabot
+ADD . /lscgbot
+WORKDIR /lscgbot
 
 RUN	bundle install
 
