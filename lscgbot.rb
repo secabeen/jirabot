@@ -16,7 +16,7 @@ class LSCGBot < SlackRubyBot::Bot
     # Also remove emoji, because skin-tone-2 and similar were showing up
     tomatch = tomatch.sub /:\b\S*\b:/, ''
     
-    # Now grab everything that looks like a JIRA ticket, dump it into an array, grab uniques.
+    # Now grab everything that looks like a LSCG ticket, dump it into an array, grab uniques.
     
     tomatch.scan(/(\[[0-9]{9}|#\d+)/i) do |i,j|
     	results << i.upcase
@@ -40,7 +40,6 @@ class LSCGBot < SlackRubyBot::Bot
         case res
         when Net::HTTPSuccess, Net::HTTPRedirection
           ticketdata = res.body
-	  puts ticketdata
 	  ticketdata.lines.each do |line|
             line.match(/^Subject: (.*)/) do |match|
               message << match[1]+"\n"
