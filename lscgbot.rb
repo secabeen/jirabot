@@ -65,7 +65,6 @@ class LSCGBot < SlackRubyBot::Bot
 	ticket = ticket[1..-1]
         message << 'https://www.lscg.ucsb.edu/helpdesk/tech/editTicket.php?taskid='+ticket
       end
-      pp ticketinfoarray
       client.web_client.chat_postMessage(channel: data.channel, text: message, attachments: ticketinfoarray.to_json, as_user: true)
     end
   end
