@@ -1,12 +1,15 @@
 require 'slack-ruby-bot'
 require "net/https"
 require "uri"
+require 'pp'
 
 class LSCGBot < SlackRubyBot::Bot
   match(/(\[[0-9]{9}|#\d+)/i) do |client, data, issues|
     puts data.text
     results = []
-    message = '```'
+    message = ''
+    ticketinfoarray = []
+    ticketinfo = {}
     tomatch = data.text
     
     # Remove links from text, since they're already links, by grabbing everything between < and >
@@ -19,10 +22,17 @@ class LSCGBot < SlackRubyBot::Bot
     # Now grab everything that looks like a LSCG ticket, dump it into an array, grab uniques.
     
     tomatch.scan(/(\[[0-9]{9}|#\d+)/i) do |i,j|
-    	results << i.upcase
+      results << i.upcase
     end
+# Does not work yet
+=begin
+    tomatch.scan(/Display.html\?id=(\d+)/) do |i,j|
+      results << i.upcase
+    end
+=end
     results.uniq.each do |ticket|
       if ticket =~ /#/
+        
 	ticket = ticket[1..-1]
 
 	uripath = 'https://help.chem.ucsb.edu/rt/REST/1.0/ticket/'+ticket+'/show'
@@ -42,20 +52,21 @@ class LSCGBot < SlackRubyBot::Bot
           ticketdata = res.body
 	  ticketdata.lines.each do |line|
             line.match(/^Subject: (.*)/) do |match|
-              message << match[1]+"\n"
+              ticketinfo["text"] = match[1]+"\n"
             end
             line.match(/^Requestors: (.*)/) do |match|
-              message << match[1]+"\n"
+              ticketinfo["author_name"] = match[1]+"\n"
             end
 	  end
+	  ticketinfoarray.push(ticketinfo)
         end
         message << 'https://help.chem.ucsb.edu/rt/Ticket/Display.html?id='+ticket
-      else 
+      else
 	ticket = ticket[1..-1]
         message << 'https://www.lscg.ucsb.edu/helpdesk/tech/editTicket.php?taskid='+ticket
       end
-      message << '```'
-      client.say(channel: data.channel, text: message)
+      pp ticketinfoarray
+      client.web_client.chat_postMessage(channel: data.channel, text: message, attachments: ticketinfoarray.to_json)
     end
   end
 end
