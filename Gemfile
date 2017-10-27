@@ -5,6 +5,7 @@ gem 'puma'
 gem 'sinatra'
 gem 'dotenv'
 gem 'json_pure'
+gem 'mysql'
 
 group :development, :test do
   gem 'rake'

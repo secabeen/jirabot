@@ -2,6 +2,7 @@ require 'slack-ruby-bot'
 require "net/https"
 require "uri"
 require 'pp'
+require 'mysql'
 
 class LSCGBot < SlackRubyBot::Bot
   match(/(\[[0-9]{9}|#\d+)/i) do |client, data, issues|
@@ -63,6 +64,19 @@ class LSCGBot < SlackRubyBot::Bot
         message << 'https://help.chem.ucsb.edu/rt/Ticket/Display.html?id='+ticket
       else
 	ticket = ticket[1..-1]
+
+	con = Mysql.new(ENV["MY_HOSTNAME"], ENV["MY_USER"], ENV["MY_PASS"], ENV["MY_DB"])
+	rs = con.query('select * from tickets where id = '+ticket+' limit 1')
+        record = rs.fetch_hash
+
+	unless record.nil?
+	  ticketinfo["text"] = record["task_title"]
+	  ticketinfo["author_name"] = record["user"]+' '+record["email"]
+	  ticketinfoarray.push(ticketinfo)
+	end
+
+	con.close
+
         message << 'https://www.lscg.ucsb.edu/helpdesk/tech/editTicket.php?taskid='+ticket
       end
       client.web_client.chat_postMessage(channel: data.channel, text: message, attachments: ticketinfoarray.to_json, as_user: true)
