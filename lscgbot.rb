@@ -5,12 +5,9 @@ require 'pp'
 require 'mysql'
 
 class LSCGBot < SlackRubyBot::Bot
-  match(/(\[[0-9]{9}|#\d+)/i) do |client, data, issues|
+  match(/(\[[0-9]{9}|#\d+|@[A-Z][A-Za-z]+)/) do |client, data, issues|
     puts data.text
     results = []
-    message = ''
-    ticketinfoarray = []
-    ticketinfo = {}
     tomatch = data.text
     
     # Remove links from text, since they're already links, by grabbing everything between < and >
@@ -22,8 +19,8 @@ class LSCGBot < SlackRubyBot::Bot
     
     # Now grab everything that looks like a LSCG ticket, dump it into an array, grab uniques.
     
-    tomatch.scan(/(\[[0-9]{9}|#\d+)/i) do |i,j|
-      results << i.upcase
+    tomatch.scan(/(\[[0-9]{9}|#\d+|@[A-Z][A-Za-z]+)/) do |i,j|
+      results << i
     end
 # Does not work yet
 =begin
@@ -32,6 +29,9 @@ class LSCGBot < SlackRubyBot::Bot
     end
 =end
     results.uniq.each do |ticket|
+      message = ''
+      ticketinfoarray = []
+      ticketinfo = {}
       if ticket =~ /#/
         
 	ticket = ticket[1..-1]
@@ -61,8 +61,9 @@ class LSCGBot < SlackRubyBot::Bot
 	  end
 	  ticketinfoarray.push(ticketinfo)
         end
-        message << 'https://help.chem.ucsb.edu/rt/Ticket/Display.html?id='+ticket
-      else
+        message << 'https://help.chem.ucsb.edu/rt/Ticket/Display.html?id='+ticket+"\n"
+      end
+      if ticket =~ /\[\d+/
 	ticket = ticket[1..-1]
 
 	con = Mysql.new(ENV["MY_HOSTNAME"], ENV["MY_USER"], ENV["MY_PASS"], ENV["MY_DB"])
@@ -77,7 +78,11 @@ class LSCGBot < SlackRubyBot::Bot
 
 	con.close
 
-        message << 'https://www.lscg.ucsb.edu/helpdesk/tech/editTicket.php?taskid='+ticket
+        message << 'https://www.lscg.ucsb.edu/helpdesk/tech/editTicket.php?taskid='+ticket+"\n"
+      end
+      if ticket =~ /@[A-Z][A-Za-z]+/
+	mentionuser = ticket.downcase
+        message << mentionuser+"\n"
       end
       client.web_client.chat_postMessage(channel: data.channel, text: message, attachments: ticketinfoarray.to_json, as_user: true)
     end
