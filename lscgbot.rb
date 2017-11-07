@@ -5,7 +5,7 @@ require 'pp'
 require 'mysql'
 
 class LSCGBot < SlackRubyBot::Bot
-  match(/(\[[0-9]{9}|#\d+|@[A-Z][A-Za-z]+)/) do |client, data, issues|
+  match(/(\[[0-9]{9}|#\d+|@[A-Z][A-Za-z]+)\b/) do |client, data, issues|
     puts data.text
     results = []
     tomatch = data.text
@@ -19,7 +19,7 @@ class LSCGBot < SlackRubyBot::Bot
     
     # Now grab everything that looks like a LSCG ticket, dump it into an array, grab uniques.
     
-    tomatch.scan(/(\[[0-9]{9}|#\d+|@[A-Z][A-Za-z]+)/) do |i,j|
+    tomatch.scan(/(\[[0-9]{9}|#\d+\b|@[A-Z][A-Za-z]+)\b/) do |i,j|
       results << i
     end
 # Does not work yet
