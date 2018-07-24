@@ -80,10 +80,6 @@ class LSCGBot < SlackRubyBot::Bot
 
         message << 'https://www.lscg.ucsb.edu/helpdesk/tech/editTicket.php?taskid='+ticket+"\n"
       end
-      if ticket =~ /@[A-Z][A-Za-z]+/
-	mentionuser = ticket.downcase
-        message << mentionuser+"\n"
-      end
       client.web_client.chat_postMessage(channel: data.channel, text: message, attachments: ticketinfoarray.to_json, as_user: true)
     end
   end
