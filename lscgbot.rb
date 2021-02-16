@@ -36,7 +36,7 @@ class LSCGBot < SlackRubyBot::Bot
         
 	ticket = ticket[1..-1]
 
-	uripath = 'https://help.chem.ucsb.edu/rt/REST/1.0/ticket/'+ticket+'/show'
+	uripath = 'https://help.lscg.ucsb.edu/rt/REST/1.0/ticket/'+ticket+'/show'
         uri = URI(uripath)
 
         req = Net::HTTP::Post.new(uri.path)
@@ -61,7 +61,7 @@ class LSCGBot < SlackRubyBot::Bot
 	  end
 	  ticketinfoarray.push(ticketinfo)
         end
-        message << 'https://help.chem.ucsb.edu/rt/Ticket/Display.html?id='+ticket+"\n"
+        message << 'https://help.lscg.ucsb.edu/rt/Ticket/Display.html?id='+ticket+"\n"
       end
       if ticket =~ /\[\d+/
 	ticket = ticket[1..-1]
